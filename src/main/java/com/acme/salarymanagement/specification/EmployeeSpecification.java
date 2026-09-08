@@ -3,6 +3,8 @@ package com.acme.salarymanagement.specification;
 import com.acme.salarymanagement.entity.Employee;
 import com.acme.salarymanagement.entity.EmployeeStatus;
 
+import jakarta.persistence.criteria.Expression;
+
 import org.springframework.data.jpa.domain.Specification;
 
 public class EmployeeSpecification {
@@ -20,6 +22,19 @@ public class EmployeeSpecification {
 
             String value =
                     "%" + search.trim().toLowerCase() + "%";
+
+            Expression<String> fullName =
+                    criteriaBuilder.concat(
+                            criteriaBuilder.concat(
+                                    criteriaBuilder.lower(
+                                            root.get("firstName")
+                                    ),
+                                    " "
+                            ),
+                            criteriaBuilder.lower(
+                                    root.get("lastName")
+                            )
+                    );
 
             return criteriaBuilder.or(
 
@@ -41,6 +56,11 @@ public class EmployeeSpecification {
                             criteriaBuilder.lower(
                                     root.get("lastName")
                             ),
+                            value
+                    ),
+
+                    criteriaBuilder.like(
+                            fullName,
                             value
                     ),
 
